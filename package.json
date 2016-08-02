@@ -1,0 +1,11 @@
+{
+  "name": "lambda-node-phantom",
+  "version": "1.0.0",
+  "description": "Graphiq Content To Image Service on AWS Lambda",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Tim Goodwin",
+  "license": "MIT"
+}
