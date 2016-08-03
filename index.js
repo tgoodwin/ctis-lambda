@@ -8,7 +8,7 @@ exports.handler = function(event, context, callback) {
 	process.env['PATH'] = process.env['PATH'] + ':' + process.env['LAMBDA_TASK_ROOT'];
 
 	// SET VALUES PASSED IN FROM API CALL
-	var url = event.url || 'https://w.graphiq.com/w/hbegDLDcAnj';
+	var url = 'https://w.graphiq.com/w/hbegDLDcAnj';
 	var format = (!!event.format) ? event.format : 'png';
 	var size = !!(event.size) ? event.size : '';
 	
