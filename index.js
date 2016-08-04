@@ -1,13 +1,9 @@
 var childProcess = require('child_process');
 var path = require('path');
 var AWS = require('aws-sdk');
+// var sha1 = require('node-sha1');
 
 var AWS_BUCKET_NAME = 'ctis-lambda-test';
-
-process.env['AWS_BUCKET_NAME'] = 'ctis-lambda-test';
-process.env['AWS_REGION'] = 'us-west-2';
-process.env['AWS_ACCESS_KEY_ID'] = 'AKIAJERBJ3QPUMQTDHIA';
-process.env['AWS_SECRET_ACCESS_KEY'] = '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';
 
 // img_data is a Buffer, path is a filename
 var s3_upload_image = function(img_data, path, callback) {
@@ -37,6 +33,7 @@ exports.handler = function(event, context, callback) {
 	var url = 'https://w.graphiq.com/w/hbegDLDcAnj';
 	var format = (!!event.format) ? event.format : 'png';
 	var size = !!(event.size) ? event.size : '';
+	// var filename = sha1(url) + '.' + 'png';
 	
 	var childArgs = [
 		path.join(__dirname, 'rasterize.js'),
@@ -74,12 +71,12 @@ exports.handler = function(event, context, callback) {
 	child.on('exit', function(code) {
 		console.log('child process exited with code ' + code);
 		if (code !== 0) {
-			return callback('it broke', stderr);
+			return callback(stderr, 'phantom error: ');
 		}
 		// DEPRECATED as of Node 6.0!!!
 		var buffer = new Buffer(stdout, 'base64');
-		var path = 'mytestimage.png'
-		return s3_upload_image(buffer, path, callback);
+		var filename = 'testfile.png';
+		return s3_upload_image(buffer, filename, callback);
 		// return callback(null, stdout);
 	});
 }
