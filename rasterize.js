@@ -25,7 +25,9 @@ page.open(url, function (status) {
 		phantom.exit(1);
 	}
 
+	// waiting a second for the page to load
 	window.setTimeout(function() {
+		// writes img to a base64 string
 		var base64 = page.renderBase64('PNG');
 		system.stdout.write(base64);
 		phantom.exit(0); // we are done here!

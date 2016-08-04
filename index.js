@@ -2,6 +2,32 @@ var childProcess = require('child_process');
 var path = require('path');
 var AWS = require('aws-sdk');
 
+var AWS_BUCKET_NAME = 'ctis-lambda-test';
+
+process.env['AWS_BUCKET_NAME'] = 'ctis-lambda-test';
+process.env['AWS_REGION'] = 'us-west-2';
+process.env['AWS_ACCESS_KEY_ID'] = 'AKIAJERBJ3QPUMQTDHIA';
+process.env['AWS_SECRET_ACCESS_KEY'] = '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';
+
+// img_data is a Buffer, path is a filename
+var s3_upload_image = function(img_data, path, callback) {
+	console.log('image? ', !!img_data);
+	var s3 = new AWS.S3();
+	var params = {
+		Body: img_data,
+		Bucket: AWS_BUCKET_NAME,
+		Key: path,
+		ContentType: 'image/png'
+	};
+	s3.upload(params, function(err, data) {
+		if (err) {
+			callback(err, err.message);
+		} else {
+			callback(null, 'image!');
+		}
+	});
+}
+
 exports.handler = function(event, context, callback) {
 
 	// Set the path as described here: https://aws.amazon.com/blogs/compute/running-executables-in-aws-lambda/
@@ -50,8 +76,10 @@ exports.handler = function(event, context, callback) {
 		if (code !== 0) {
 			return callback('it broke', stderr);
 		}
-		// var buffer = new Buffer(stdout);
-		// return s3_upload_image(buffer, options);
-		return callback(null, stdout);
+		// DEPRECATED as of Node 6.0!!!
+		var buffer = new Buffer(stdout, 'base64');
+		var path = 'mytestimage.png'
+		return s3_upload_image(buffer, path, callback);
+		// return callback(null, stdout);
 	});
 }
