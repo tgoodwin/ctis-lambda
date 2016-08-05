@@ -9,6 +9,7 @@
   "author": "Tim Goodwin",
   "license": "MIT",
   "dependencies": {
-    "node-sha1": "^1.0.1"
+    "node-sha1": "^1.0.1",
+    "sha1": "^1.1.1"
   }
 }
