@@ -43,7 +43,7 @@ exports.handler = function(event, context, callback) {
 	var url = event.url;
 	var format = event.format ? event.format : 'png';
 	var zoom = event.zoom ? event.zoom : 1;
-	var filename = sha1(url) + '.' + format;
+	var filename = sha1(url) + '-nowebfont' + '.' + format;
 	var size = event.size ? event.size : '';
 
 	// Set the path as described here:
