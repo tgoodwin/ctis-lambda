@@ -43,7 +43,7 @@ exports.handler = function(event, context, callback) {
 	var url = event.url;
 	var format = event.format ? event.format : 'png';
 	var zoom = event.zoom ? event.zoom : 1;
-	var filename = sha1(url) + '-nowebfont' + '.' + format;
+	var filename = sha1(url) + '-webfont' + '.' + format;
 	var size = event.size ? event.size : '';
 
 	// Set the path as described here:
@@ -68,7 +68,7 @@ exports.handler = function(event, context, callback) {
 	}
 
 	// Set the path to the phantomjs binary
-	var phantomPath = path.join(__dirname, 'phantomjs_linux-x86_64');
+	var phantomPath = path.join(__dirname, 'phantomjs');
 
 	var stderr = '';
 	var stdout = '';
