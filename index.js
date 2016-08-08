@@ -38,37 +38,34 @@ var genS3Url = function(bucket, key) {
 
 exports.handler = function(event, context, callback) {
 
+	console.log('event: ', JSON.stringify(event));
+
+	var url = event.url;
+	var format = event.format ? event.format : 'png';
+	var zoom = event.zoom ? event.zoom : 1;
+	var filename = sha1(url) + '.' + format;
+	var size = event.size ? event.size : '';
+
 	// Set the path as described here:
 	// https://aws.amazon.com/blogs/compute/running-executables-in-aws-lambda/
 	process.env['PATH'] = process.env['PATH'] + ':' + process.env['LAMBDA_TASK_ROOT'];
 
-	event.url = 'https://w.graphiq.com/w/hbegDLDcAnj';
 	// fail fast before executing phantom binary
-	if (!event.url) {
+	if (!url) {
 		console.error('No content url provided.');
 		return callback('Error: No content url provided');
 	}
-	// set values from the event object (what's passed in from the POST request body)
-	// var url = event.url ? event.url : 'https://w.graphiq.com/w/hbegDLDcAnj';
-	var format = (event.format === 'jpg') ? 'jpg' : 'png';
-	var size = event.size ? event.size : '';
-	var filename = sha1(event.url) + '.' + format; // dont use filenamefull
 
-
-	// not gonna bother with the require('optimist') stuff
-	// nobody's gonna be passing in params from the command line with their fingers
-	var phantomParams = {
-		url: formatInputUrl(event.url),
-		size: event.size,
-		format: event.format,
-		zoom: event.zoom ? event.zoom : 1
-	};
-	console.log(phantomParams);
-	
 	var childArgs = [
 		path.join(__dirname, 'rasterize.js'),
-		phantomParams
+		url,
+		format,
+		zoom
 	];
+
+	if (size) {
+		childArgs = childArgs.concat([size]);
+	}
 
 	// Set the path to the phantomjs binary
 	var phantomPath = path.join(__dirname, 'phantomjs_linux-x86_64');
@@ -85,10 +82,9 @@ exports.handler = function(event, context, callback) {
 		}
 	});
 	
-	// this should only be the base64 representation of the png screenshot.
+	// the screenshot data returns from the Phantom process
 	child.stdout.on('data', function(data) {
 		stdout += data;
-		console.log(data);
 	});
 
 	child.stderr.on('data', function(data) {

@@ -2,31 +2,44 @@
 
 var system = require('system');
 var page = require('webpage').create();
+// var argv = require('yargs').argv;
 
-var env = system.env;
+var args = system.args;
+
 var imgFormat = 'PNG';
 
 page.settings.userAgent = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) '
 	+ 'Chrome/37.0.2062.120 Safari/537.36 FTBImageGenerator/1.0';
 
-// object with keys url, size, and zoom
-var args = system.args[1];
 var defaultViewport = {width: 1440, height: 900};
 page.viewportSize = defaultViewport;
 
+// SET EVERYTHING.
+// this solution is brittle, it's certainly bad
+// i wanted something better but lambda got mad
+// (was getting errors with 'yargs' parser module)
+var url, format, zoom, size;
+if (system.args.length >= 4) {
+	url = system.args[1];
+	format = system.args[2];
+	zoom = system.args[3];
+	if (system.args.length >= 5)
+		size = system.args[4];
+}
+
 var argWidth, argHeight;
-if (args.size) {
-	var size = ('' + args.size).split('*');
+if (size) {
+	var size = ('' + size).split('*');
 	argWidth = size[0] ? parseInt(size[0], 10) : null;
 	argHeight = size[1] ? parseInt(size[1], 10) : null;
 	page.viewportSize = {
-		width: defaultViewport.width,
-		height: defaultViewport.height
+		width: argWidth ? argWidth : defaultViewport.width,
+		height: argHeight ? argHeight : defaultViewport.height
 	};
 }
 
-imgFormat = (args.format === 'jpg') ? 'JPEG' : 'PNG';
-page.zoomFactor = args.zoom || 1;
+imgFormat = (format === 'jpg') ? 'JPEG' : 'PNG';
+page.zoomFactor = zoom || 1;
 
 var renderAndExit = function() {
 	var contentWidth = page.evaluateJavaScript('function() {return document.body.firstElementChild.offsetWidth;}');
@@ -35,8 +48,8 @@ var renderAndExit = function() {
 	page.clipRect = {
 		top: 0,
 		left: 0,
-		width: contentWidth,
-		height: contentHeight
+		width: argWidth ? argWidth : contentWidth,
+		height: argHeight ? argHeight : contentHeight
 	};
 
 	// wait a second for the page to load before screenshotting
@@ -55,12 +68,12 @@ page.onResourceReceived = function(response) {
 };
 
 // help us see potential server-side errors in the Lambda console
-page.onResourceError= function(resourceError) {
+page.onResourceError = function(resourceError) {
 	page.reason = resourceError.errorString;
 	page.reason_url = resourceError.url;
 };
 
-page.open(args.url, function (status) {
+page.open(url, function (status) {
 	if (status !== 'success') {
 		system.stderr.write('Error opening url \'' + page.reason_url + '\': ' + page.reason);
 		phantom.exit(1);
