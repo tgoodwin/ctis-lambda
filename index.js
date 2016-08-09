@@ -33,7 +33,7 @@ var formatInputUrl = function(url) {
 
 // assumes S3 bucket statically hosted with valid website endpoint
 var genS3Url = function(bucket, key) {
-	return 'https://' + bucket + '/' + key;
+	return 'https://s3-us-west-2.amazonaws.com/' + bucket + '/' + key;
 }
 
 exports.handler = function(event, context, callback) {

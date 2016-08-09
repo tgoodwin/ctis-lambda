@@ -4,8 +4,7 @@ var system = require('system');
 var page = require('webpage').create();
 // var argv = require('yargs').argv;
 
-var args = system.args;
-
+var SCREENSHOT_TIMEOUT = 1000;
 var imgFormat = 'PNG';
 
 page.settings.userAgent = 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) '
@@ -57,7 +56,7 @@ var renderAndExit = function() {
 		var base64 = page.renderBase64(imgFormat);
 		system.stdout.write(base64);
 		phantom.exit(0);
-	}, 1000);
+	}, SCREENSHOT_TIMEOUT);
 };
 
 page.onResourceReceived = function(response) {
